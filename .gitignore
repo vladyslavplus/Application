@@ -6,6 +6,7 @@ obj/
 *.userosscache
 *.sln.docstates
 *.swp
+appsettings.Development.json
 
 # Rider / VSCode / Visual Studio
 .vscode/
