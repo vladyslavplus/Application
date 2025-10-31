@@ -1,0 +1,45 @@
+# === .NET / C# ===
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.swp
+
+# Rider / VSCode / Visual Studio
+.vscode/
+.idea/
+*.csproj.user
+
+# === Logs / Cache ===
+*.log
+logs/
+LogFiles/
+.vs/
+_ReSharper.Caches/
+
+# === Build / Publish artifacts ===
+/out/
+/publish/
+/artifacts/
+
+# === Entity Framework migrations temp files ===
+*.dbmdl
+
+# === Environment / Secrets ===
+.env
+!/.env.example
+
+# === Docker ===
+docker-compose.override.yml
+.docker/
+
+# === Frontend ===
+/node_modules/
+/dist/
+/build/
+
+# === OS files ===
+.DS_Store
+Thumbs.db
