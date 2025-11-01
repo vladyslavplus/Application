@@ -130,6 +130,21 @@ namespace Evently.Infrastructure.Persistence
                     await context.SaveChangesAsync();
 
                     logger.LogInformation("Sample events created successfully");
+
+                    var techConference = events.First(e => e.Title == "Tech Conference 2025");
+                    var animeMeetup = events.First(e => e.Title == "Anime Meetup");
+
+                    var participants = new List<EventParticipant>
+                    {
+                        new() { EventId = techConference.Id, UserId = user.Id, JoinedAt = DateTimeOffset.UtcNow },
+                        new() { EventId = animeMeetup.Id, UserId = admin.Id, JoinedAt = DateTimeOffset.UtcNow },
+                        new() { EventId = animeMeetup.Id, UserId = user.Id, JoinedAt = DateTimeOffset.UtcNow }
+                    };
+
+                    await context.EventParticipants.AddRangeAsync(participants);
+                    await context.SaveChangesAsync();
+
+                    logger.LogInformation("Event participants seeded successfully");
                 }
             }
             catch (Exception ex)

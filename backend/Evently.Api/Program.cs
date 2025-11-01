@@ -1,11 +1,18 @@
-using System.Text;
+using Evently.Api.Middleware;
+using Evently.Application;
+using Evently.Application.Interfaces;
+using Evently.Application.Services;
+using Evently.Domain.Interfaces;
 using Evently.Infrastructure.Identity;
 using Evently.Infrastructure.Persistence;
+using Evently.Infrastructure.Repositories;
+using Evently.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +31,7 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-var jwtKey = builder.Configuration["Jwt:Key"] ?? "supersecretkeyhere12345";
+var jwtKey = builder.Configuration["Jwt:Key"] ?? "this_is_a_very_long_and_secure_secret_key_1234567890";
 var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "Evently.Api";
 var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "Evently.Client";
 
@@ -48,6 +55,23 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
+builder.Services.AddScoped<IEventRepository, EventRepository>();
+builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IJwtTokenGeneratorService, JwtTokenGeneratorService>();
+builder.Services.AddFluentValidationSetup(typeof(IEventService).Assembly);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -80,6 +104,8 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+app.UseMiddleware<ErrorHandlingMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -87,10 +113,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
 await ApplicationDbSeeder.SeedAsync(app.Services);
-
 await app.RunAsync();
