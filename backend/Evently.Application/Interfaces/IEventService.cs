@@ -4,8 +4,8 @@ namespace Evently.Application.Interfaces
 {
     public interface IEventService
     {
-        Task<IEnumerable<EventDto>> GetPublicEventsAsync(CancellationToken cancellationToken = default);
-        Task<EventDetailDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
+        Task<IEnumerable<EventDto>> GetPublicEventsAsync(Guid? currentUserId = null, CancellationToken cancellationToken = default);
+        Task<EventDetailDto?> GetByIdAsync(Guid id, Guid? currentUserId = null, CancellationToken cancellationToken = default);
         Task<IEnumerable<EventDto>> GetUserEventsAsync(Guid userId, CancellationToken cancellationToken = default);
         Task<EventDto> CreateAsync(Guid organizerId, EventCreateDto dto, CancellationToken cancellationToken = default);
         Task<bool> UpdateAsync(Guid id, Guid organizerId, EventUpdateDto dto, CancellationToken cancellationToken = default);

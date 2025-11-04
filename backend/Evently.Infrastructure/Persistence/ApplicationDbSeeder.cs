@@ -38,6 +38,7 @@ namespace Evently.Infrastructure.Persistence
 
                 var adminEmail = "admin@example.com";
                 var userEmail = "user@example.com";
+                var aliceEmail = "alice@example.com";
 
                 var admin = await userManager.FindByEmailAsync(adminEmail);
                 if (admin == null)
@@ -53,14 +54,7 @@ namespace Evently.Infrastructure.Persistence
 
                     var result = await userManager.CreateAsync(admin, "Admin@1234");
                     if (result.Succeeded)
-                    {
                         await userManager.AddToRoleAsync(admin, "Admin");
-                        logger.LogInformation("Admin user created");
-                    }
-                    else
-                    {
-                        logger.LogError("Failed to create admin: {Errors}", string.Join(", ", result.Errors.Select(e => e.Description)));
-                    }
                 }
 
                 var user = await userManager.FindByEmailAsync(userEmail);
@@ -77,15 +71,27 @@ namespace Evently.Infrastructure.Persistence
 
                     var result = await userManager.CreateAsync(user, "User@1234");
                     if (result.Succeeded)
-                    {
                         await userManager.AddToRoleAsync(user, "User");
-                        logger.LogInformation("Regular user created");
-                    }
-                    else
-                    {
-                        logger.LogError("Failed to create user: {Errors}", string.Join(", ", result.Errors.Select(e => e.Description)));
-                    }
                 }
+
+                var alice = await userManager.FindByEmailAsync(aliceEmail);
+                if (alice == null)
+                {
+                    alice = new ApplicationUser
+                    {
+                        UserName = "Alice",
+                        Email = aliceEmail,
+                        FullName = "Alice Johnson",
+                        EmailConfirmed = true,
+                        CreatedAt = DateTime.UtcNow
+                    };
+
+                    var result = await userManager.CreateAsync(alice, "Alice@1234");
+                    if (result.Succeeded)
+                        await userManager.AddToRoleAsync(alice, "User");
+                }
+
+                await context.SaveChangesAsync();
 
                 if (!await context.Events.AnyAsync())
                 {
@@ -123,6 +129,28 @@ namespace Evently.Infrastructure.Persistence
                             Capacity = null,
                             IsPublic = false,
                             OrganizerId = admin.Id
+                        },
+                        new()
+                        {
+                            Title = "Startup Pitch Night",
+                            Description = "An evening of innovative startup presentations.",
+                            StartDate = DateTimeOffset.UtcNow.AddDays(7),
+                            EndDate = DateTimeOffset.UtcNow.AddDays(7).AddHours(3),
+                            Location = "Lviv, Ukraine",
+                            Capacity = 50,
+                            IsPublic = true,
+                            OrganizerId = alice.Id
+                        },
+                        new()
+                        {
+                            Title = "Photography Workshop",
+                            Description = "Hands-on workshop for photography lovers.",
+                            StartDate = DateTimeOffset.UtcNow.AddDays(2),
+                            EndDate = DateTimeOffset.UtcNow.AddDays(2).AddHours(4),
+                            Location = "Odessa, Ukraine",
+                            Capacity = 2,
+                            IsPublic = true,
+                            OrganizerId = user.Id
                         }
                     };
 
@@ -133,12 +161,15 @@ namespace Evently.Infrastructure.Persistence
 
                     var techConference = events.First(e => e.Title == "Tech Conference 2025");
                     var animeMeetup = events.First(e => e.Title == "Anime Meetup");
+                    var photographyWorkshop = events.First(e => e.Title == "Photography Workshop");
 
                     var participants = new List<EventParticipant>
                     {
                         new() { EventId = techConference.Id, UserId = user.Id, JoinedAt = DateTimeOffset.UtcNow },
                         new() { EventId = animeMeetup.Id, UserId = admin.Id, JoinedAt = DateTimeOffset.UtcNow },
-                        new() { EventId = animeMeetup.Id, UserId = user.Id, JoinedAt = DateTimeOffset.UtcNow }
+                        new() { EventId = animeMeetup.Id, UserId = user.Id, JoinedAt = DateTimeOffset.UtcNow },
+                        new() { EventId = photographyWorkshop.Id, UserId = user.Id, JoinedAt = DateTimeOffset.UtcNow },
+                        new() { EventId = photographyWorkshop.Id, UserId = alice.Id, JoinedAt = DateTimeOffset.UtcNow }
                     };
 
                     await context.EventParticipants.AddRangeAsync(participants);

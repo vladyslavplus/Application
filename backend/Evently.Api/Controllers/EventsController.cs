@@ -26,7 +26,11 @@ namespace Evently.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<EventDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetPublicEvents(CancellationToken cancellationToken)
         {
-            var events = await _eventService.GetPublicEventsAsync(cancellationToken);
+            Guid? userId = null;
+            if (User.Identity?.IsAuthenticated == true)
+                userId = GetUserId();
+
+            var events = await _eventService.GetPublicEventsAsync(userId, cancellationToken);
             return Ok(events);
         }
 
@@ -40,7 +44,11 @@ namespace Evently.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
         {
-            var ev = await _eventService.GetByIdAsync(id, cancellationToken);
+            Guid? userId = null;
+            if (User.Identity?.IsAuthenticated == true)
+                userId = GetUserId();
+
+            var ev = await _eventService.GetByIdAsync(id, userId, cancellationToken);
             if (ev == null)
                 return NotFound();
 

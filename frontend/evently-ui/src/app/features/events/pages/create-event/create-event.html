@@ -1,0 +1,204 @@
+<div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-3xl mx-auto">
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-bold text-gray-900 mb-2">Create New Event</h1>
+      <p class="text-gray-600">Fill in the details to create your event</p>
+    </div>
+
+    @if (!isLoggedIn()) {
+      <div class="bg-white rounded-2xl shadow-xl p-12 text-center">
+        <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-gray-800 mb-2">Authentication Required</h3>
+        <p class="text-gray-600 mb-6">You must be logged in to create an event</p>
+        <a
+          routerLink="/auth/login"
+          class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+        >
+          Sign In
+        </a>
+      </div>
+    } @else {
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <div class="p-8 space-y-6">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                Event Title <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                formControlName="title"
+                class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                placeholder="Enter a catchy event title"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                Description
+              </label>
+              <textarea
+                formControlName="description"
+                rows="4"
+                class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none resize-none"
+                placeholder="What's your event about? Add some details..."
+              ></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  Start Date & Time <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  formControlName="startDate"
+                  class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                />
+                @if (form.get('startDate')?.value && !isDateValid()) {
+                  <p class="text-xs text-red-500 mt-1.5">Start date must be in the future</p>
+                }
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  End Date & Time
+                </label>
+                <input
+                  type="datetime-local"
+                  formControlName="endDate"
+                  class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                Location <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  formControlName="location"
+                  class="w-full border border-gray-300 rounded-lg pl-12 pr-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                  placeholder="Where will this event take place?"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                Capacity
+              </label>
+              <div class="relative">
+                <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                  </svg>
+                </div>
+                <input
+                  type="number"
+                  min="1"
+                  formControlName="capacity"
+                  class="w-full border border-gray-300 rounded-lg pl-12 pr-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                  placeholder="Leave empty for unlimited"
+                />
+              </div>
+              <p class="text-xs text-gray-500 mt-1.5">Maximum number of participants (optional)</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-3">
+                Event Visibility
+              </label>
+              <div class="grid grid-cols-2 gap-4">
+                <label class="relative flex items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-all"
+                  [class.border-blue-500]="form.get('isPublic')?.value === true"
+                  [class.bg-blue-50]="form.get('isPublic')?.value === true"
+                  [class.border-gray-300]="form.get('isPublic')?.value !== true"
+                >
+                  <input type="radio" formControlName="isPublic" [value]="true" class="sr-only" />
+                  <div class="text-center">
+                    <svg class="w-8 h-8 mx-auto mb-2" 
+                      [class.text-blue-600]="form.get('isPublic')?.value === true"
+                      [class.text-gray-400]="form.get('isPublic')?.value !== true"
+                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="font-medium" 
+                      [class.text-blue-600]="form.get('isPublic')?.value === true"
+                      [class.text-gray-700]="form.get('isPublic')?.value !== true">
+                      Public
+                    </span>
+                    <p class="text-xs text-gray-500 mt-1">Anyone can view and join</p>
+                  </div>
+                </label>
+                
+                <label class="relative flex items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-all"
+                  [class.border-blue-500]="form.get('isPublic')?.value === false"
+                  [class.bg-blue-50]="form.get('isPublic')?.value === false"
+                  [class.border-gray-300]="form.get('isPublic')?.value !== false"
+                >
+                  <input type="radio" formControlName="isPublic" [value]="false" class="sr-only" />
+                  <div class="text-center">
+                    <svg class="w-8 h-8 mx-auto mb-2"
+                      [class.text-blue-600]="form.get('isPublic')?.value === false"
+                      [class.text-gray-400]="form.get('isPublic')?.value !== false"
+                      fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                    </svg>
+                    <span class="font-medium"
+                      [class.text-blue-600]="form.get('isPublic')?.value === false"
+                      [class.text-gray-700]="form.get('isPublic')?.value !== false">
+                      Private
+                    </span>
+                    <p class="text-xs text-gray-500 mt-1">Invite only</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            @if (errorMessage()) {
+              <div class="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+                <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+                <p class="text-sm text-red-700 font-medium">{{ errorMessage() }}</p>
+              </div>
+            }
+          </div>
+
+          <div class="px-8 py-6 bg-gray-50 border-t border-gray-200">
+            <button
+              type="submit"
+              [disabled]="isSubmitting()"
+              class="w-full bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-3.5 rounded-lg font-semibold transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              @if (isSubmitting()) {
+                <svg class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Creating Event...</span>
+              } @else {
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                <span>Create Event</span>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    }
+  </div>
+</div>

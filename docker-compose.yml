@@ -35,6 +35,19 @@ services:
     networks:
       - evently-net
 
+  evently-ui:
+    build:
+      context: ./frontend/evently-ui
+      dockerfile: Dockerfile
+    container_name: evently-ui
+    ports:
+      - "4200:80"
+    depends_on:
+      - evently-api
+    restart: unless-stopped
+    networks:
+      - evently-net
+
 volumes:
   evently_data:
 

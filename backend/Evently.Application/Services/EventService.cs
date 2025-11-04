@@ -14,25 +14,25 @@ namespace Evently.Application.Services
             _repository = repository;
         }
 
-        public async Task<IEnumerable<EventDto>> GetPublicEventsAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<EventDto>> GetPublicEventsAsync(Guid? currentUserId = null, CancellationToken cancellationToken = default)
         {
             var events = await _repository.GetPublicEventsAsync(cancellationToken);
-            return events.Select(MapToDto);
+            return events.Select(e => MapToDto(e, currentUserId));
         }
 
-        public async Task<EventDetailDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        public async Task<EventDetailDto?> GetByIdAsync(Guid id, Guid? currentUserId = null, CancellationToken cancellationToken = default)
         {
             var (ev, userNames) = await _repository.GetByIdWithUsersAsync(id, cancellationToken);
             if (ev == null)
                 return null;
 
-            return MapToDetailDto(ev, userNames);
+            return MapToDetailDto(ev, userNames, currentUserId);
         }
 
         public async Task<IEnumerable<EventDto>> GetUserEventsAsync(Guid userId, CancellationToken cancellationToken = default)
         {
             var events = await _repository.GetUserEventsAsync(userId, cancellationToken);
-            return events.Select(MapToDto);
+            return events.Select(e => MapToDto(e, userId));
         }
 
         public async Task<EventDto> CreateAsync(Guid organizerId, EventCreateDto dto, CancellationToken cancellationToken = default)
@@ -52,7 +52,7 @@ namespace Evently.Application.Services
             };
 
             await _repository.AddAsync(entity, cancellationToken);
-            return MapToDto(entity);
+            return MapToDto(entity, organizerId);
         }
 
         public async Task<bool> UpdateAsync(Guid id, Guid organizerId, EventUpdateDto dto, CancellationToken cancellationToken = default)
@@ -66,7 +66,10 @@ namespace Evently.Application.Services
             if (dto.StartDate.HasValue) ev.StartDate = dto.StartDate.Value;
             if (dto.EndDate.HasValue) ev.EndDate = dto.EndDate.Value;
             if (dto.Location != null) ev.Location = dto.Location;
-            if (dto.Capacity.HasValue) ev.Capacity = dto.Capacity.Value;
+            if (dto.Capacity.HasValue)
+                ev.Capacity = dto.Capacity.Value;
+            else if (dto.Capacity == null)
+                ev.Capacity = null;
             if (dto.IsPublic.HasValue) ev.IsPublic = dto.IsPublic.Value;
 
             await _repository.UpdateAsync(ev, cancellationToken);
@@ -96,7 +99,7 @@ namespace Evently.Application.Services
             return await _repository.LeaveEventAsync(eventId, userId, cancellationToken);
         }
 
-        private static EventDto MapToDto(Event e)
+        private static EventDto MapToDto(Event e, Guid? currentUserId = null)
         {
             return new EventDto
             {
@@ -109,11 +112,12 @@ namespace Evently.Application.Services
                 Capacity = e.Capacity,
                 IsPublic = e.IsPublic,
                 OrganizerId = e.OrganizerId,
-                ParticipantCount = e.Participants?.Count ?? 0
+                ParticipantCount = e.Participants?.Count ?? 0,
+                IsJoined = currentUserId != null && e.Participants?.Any(p => p.UserId == currentUserId) == true
             };
         }
 
-        private static EventDetailDto MapToDetailDto(Event e, Dictionary<Guid, string> userNames)
+        private static EventDetailDto MapToDetailDto(Event e, Dictionary<Guid, string> userNames, Guid? currentUserId = null)
         {
             return new EventDetailDto
             {
@@ -134,7 +138,8 @@ namespace Evently.Application.Services
                         FullName = userNames.ContainsKey(p.UserId)
                             ? userNames[p.UserId]
                             : "Unknown User"
-                    }).ToList() ?? new List<ParticipantDto>()
+                    }).ToList() ?? new List<ParticipantDto>(),
+                IsJoined = currentUserId != null && e.Participants?.Any(p => p.UserId == currentUserId) == true
             };
         }
     }

@@ -1,0 +1,202 @@
+<div class="max-w-4xl mx-auto px-6 py-10 relative">
+  @if (event$ | async; as event) {
+    <h2 class="text-3xl font-bold text-gray-800 mb-2">{{ event.title }}</h2>
+    <p class="text-gray-600 mb-4">{{ event.description }}</p>
+
+    <div class="space-y-1 text-gray-700 text-sm mb-6">
+      <p><span class="font-semibold">Date:</span> {{ event.startDate | date:'medium' }}</p>
+      <p><span class="font-semibold">Location:</span> {{ event.location }}</p>
+      <p><span class="font-semibold">Capacity:</span> {{ event.capacity === null ? '∞' : event.capacity }}</p>
+      <p><span class="font-semibold">Participants:</span> {{ event.participantCount }}</p>
+    </div>
+
+    <h3 class="text-lg font-semibold mb-2">Participants</h3>
+    @if (event.participants.length > 0) {
+      <ul class="space-y-1 mb-6">
+        @for (p of event.participants; track p.userId) {
+          <li class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-sm font-medium text-gray-700">
+              {{ p.fullName[0] }}
+            </div>
+            {{ p.fullName }}
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="text-gray-500 mb-6">No participants yet.</p>
+    }
+
+  @if (!isOrganizer()) {
+    @if (event.capacity && event.participantCount >= event.capacity) {
+      <button
+        class="py-2 px-4 rounded bg-gray-300 text-gray-700 font-medium cursor-not-allowed"
+        disabled
+      >
+        Event Full
+      </button>
+    }
+    @else {
+      <button
+        (click)="toggleJoin()"
+        class="py-2 px-4 rounded text-white font-medium transition-colors"
+        [ngClass]="{
+          'bg-green-600 hover:bg-green-700': !event.isJoined,
+          'bg-red-600 hover:bg-red-700': event.isJoined
+        }"
+      >
+        {{ event.isJoined ? 'Leave Event' : 'Join Event' }}
+      </button>
+    }
+  }
+
+
+    @if (isOrganizer()) {
+      <div class="mt-6 flex gap-3">
+        <button
+          (click)="openEditModal()"
+          class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded font-medium transition-colors"
+        >
+          Edit
+        </button>
+        <button
+          (click)="deleteEvent(event.id)"
+          class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded font-medium transition-colors"
+        >
+          Delete
+        </button>
+      </div>
+    }
+  } @else {
+    <p class="text-center text-gray-500 mt-10">Loading event details...</p>
+  }
+
+  @if (isEditModalOpen()) {
+    <div
+      class="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50 p-4"
+      (click)="closeEditModal()"
+    >
+      <div
+        class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 rounded-t-2xl">
+          <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-gray-800">Edit Event</h2>
+            <button
+              type="button"
+              (click)="closeEditModal()"
+              class="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <form [formGroup]="eventForm" (ngSubmit)="saveChanges()" class="px-6 py-6">
+          <div class="space-y-5">
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                Event Title <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                formControlName="title"
+                class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                placeholder="Enter event title"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                Description
+              </label>
+              <textarea
+                formControlName="description"
+                rows="4"
+                class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none resize-none"
+                placeholder="Describe your event..."
+              ></textarea>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  Start Date <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  formControlName="startDate"
+                  class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                  End Date <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  formControlName="endDate"
+                  class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                Location <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                formControlName="location"
+                class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                placeholder="Event venue or address"
+              />
+            </div>
+
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                Capacity
+              </label>
+              <div class="relative">
+                <input
+                  type="number"
+                  formControlName="capacity"
+                  class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none"
+                  placeholder="Leave empty for unlimited"
+                  (input)="onCapacityInput($event)"
+                />
+                @if (eventForm.value.capacity === Infinity) {
+                  <div class="absolute right-3 top-1/2 -translate-y-1/2 bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-full">
+                    Unlimited
+                  </div>
+                }
+              </div>
+              <p class="text-xs text-gray-500 mt-1.5">
+                Leave empty for unlimited participants
+              </p>
+            </div>
+          </div>
+
+          <div class="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
+            <button
+              type="button"
+              (click)="closeEditModal()"
+              class="px-5 py-2.5 rounded-lg border-2 border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              [disabled]="eventForm.invalid"
+              class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors shadow-sm hover:shadow-md"
+            >
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

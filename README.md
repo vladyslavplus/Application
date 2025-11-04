@@ -1,16 +1,18 @@
 # 🎟️ Evently — Event Management Application
 
-**Evently** is a demo web application for creating, viewing, and managing events.  
-Built with **.NET 8 Web API** and **PostgreSQL**, fully containerized with Docker.
+**Evently** is a full-stack web application for creating, viewing, and managing events.  
+Built with **.NET 8 Web API**, **Angular**, and **PostgreSQL**, fully containerized with Docker.
 
 ---
 
 ## 🧰 Tech Stack
 
-- ASP.NET Core 8 Web API  
-- Entity Framework Core + PostgreSQL  
-- Docker & Docker Compose  
+- ASP.NET Core 8 Web API (C#)
+- Angular + TypeScript
+- Entity Framework Core + PostgreSQL
+- Docker & Docker Compose
 - JWT Authentication using ASP.NET Identity
+- Tailwind CSS for UI styling
 
 ---
 
@@ -20,7 +22,9 @@ Make sure you have the following installed:
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 - [Git](https://git-scm.com/)
-- [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) *(optional for local builds)*
+- [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) *(optional for local backend builds)*
+- [Node.js 20+](https://nodejs.org/en) *(optional for local frontend builds)*
+- [Angular CLI](https://angular.io/cli) *(optional, for development mode)*
 
 ---
 
@@ -70,15 +74,18 @@ docker-compose up --build
 This will:
 - Start the PostgreSQL database  
 - Wait until it's healthy  
-- Launch the Evently API container  
+- Launch both the **Evently API** and **Angular UI** containers
 
 ---
 
-### 4️⃣ Access the API
-Once started successfully:
+### 4️⃣ Access the Application
 
-- Swagger UI → [http://localhost:5000/swagger](http://localhost:5000/swagger)
-- API base URL → `http://localhost:5000/api`
+#### 🌐 Frontend (Angular)
+- [http://localhost:4200](http://localhost:4200)
+
+#### ⚙️ Backend (API + Swagger)
+- [http://localhost:5000/swagger](http://localhost:5000/swagger)
+- Base API URL → `http://localhost:5000/api`
 
 ---
 
@@ -92,29 +99,13 @@ Once started successfully:
 - Email: `user@example.com`
 - Password: `User@1234`
 
+---
+
 ### 6️⃣ Stop containers
 To shut everything down:
 
 ```bash
 docker-compose down
-```
-
----
-
-## 📁 Project Structure
-
-```
-Application/
-├── .env
-├── .env.example
-├── docker-compose.yml
-├── README.md
-└── backend/
-    ├── Dockerfile
-    ├── Evently.Api/
-    ├── Evently.Application/
-    ├── Evently.Domain/
-    └── Evently.Infrastructure/
 ```
 
 ---

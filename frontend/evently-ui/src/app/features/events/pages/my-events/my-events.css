@@ -1,0 +1,84 @@
+:host ::ng-deep .fc {
+  font-size: 0.875rem;
+}
+
+@media (max-width: 639px) {
+  :host ::ng-deep .fc {
+    font-size: 0.75rem;
+  }
+
+  :host ::ng-deep .fc-daygrid-day-number {
+    font-size: 0.8rem;
+    padding: 4px 6px;
+    font-weight: 600;
+  }
+
+  :host ::ng-deep .fc-col-header-cell-cushion {
+    padding: 8px 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  :host ::ng-deep .fc-daygrid-event {
+    margin: 2px 0;
+    padding: 3px 4px;
+    font-size: 0.7rem;
+  }
+
+  :host ::ng-deep .fc-event-title {
+    font-size: 0.7rem;
+  }
+
+  :host ::ng-deep .fc-daygrid-day-frame {
+    min-height: 100px;
+  }
+
+  :host ::ng-deep .fc-daygrid-day-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (min-width: 640px) {
+  :host ::ng-deep .fc-daygrid-day-number {
+    padding: 6px;
+  }
+
+  :host ::ng-deep .fc-col-header-cell-cushion {
+    padding: 8px 4px;
+  }
+
+  :host ::ng-deep .fc-daygrid-event {
+    margin: 2px 0;
+    padding: 2px 4px;
+  }
+}
+
+:host ::ng-deep .fc-daygrid-event:hover {
+  cursor: pointer;
+  opacity: 0.9;
+}
+
+:host ::ng-deep .fc-day-today {
+  background-color: rgba(59, 130, 246, 0.05) !important;
+}
+
+:host ::ng-deep .fc-daygrid-event {
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+:host ::ng-deep .fc-event-main {
+  overflow: hidden;
+}
+
+:host ::ng-deep .fc-theme-standard td,
+:host ::ng-deep .fc-theme-standard th {
+  border-color: #e5e7eb;
+}
+
+:host ::ng-deep .fc-col-header-cell {
+  background-color: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+}

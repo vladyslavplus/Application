@@ -12,5 +12,6 @@
         public bool IsPublic { get; set; }
         public int ParticipantCount { get; set; }
         public Guid OrganizerId { get; set; }
+        public bool IsJoined { get; set; }
     }
 }
